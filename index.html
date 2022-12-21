@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>Leitor de QR</title>
+    <style>
+      /* Estilo para a mensagem de suporte à API de câmera */
+      .camera-supported {
+        color: blue;
+      }
+
+      /* Estilo para as informações do QR CODE */
+      .qr-info {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Incluímos a biblioteca qrcode -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/qrcode-reader@1.1.3/dist/qrcode-reader.min.js"></script>
+
+    <!-- Criamos um elemento para mostrar a mensagem de suporte à API de câmera -->
+    <div id="camera-status"></div>
+
+    <!-- Criamos um elemento para mostrar as informações do QR CODE -->
+    <div id="qr-info"></div>
+
+    <script>
+      // Código JavaScript para ler códigos QR usando a câmera
+      // (veja a resposta anterior para obter mais detalhes)
+      if ('getUserMedia' in navigator) {
+        console.log('API de câmera disponível');
+        document.getElementById('camera-status').innerHTML = '<p class="camera-supported">API de câmera disponível</p>';
+        navigator.getUserMedia({ video: true }, stream => {
+          const videoElement = document.createElement('video');
+          videoElement.srcObject = stream;
+          videoElement.play();
+          const canvasElement = document.createElement('canvas');
+          const canvasContext = canvasElement.getContext('2d');
+          setInterval(() => {
+            canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+            const imageData = canvasContext.getImageData(0, 0, canvasElement.width, canvasElement.height);
+            qrcode.callback = result => {
+              if (result) {
+                console.log(`Informações do QR: ${result}`);
+              }
+            };
+            qrcode.decode(imageData);
+          }, 1000);
+        });
