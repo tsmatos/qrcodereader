@@ -4,9 +4,18 @@ navigator.getUserMedia = navigator.getUserMedia ||
                         navigator.mozGetUserMedia ||
                         navigator.msGetUserMedia;
 
-if (navigator.getUserMedia) {
-    navigator.getUserMedia({ video: {facingMode: "environment"} }, handleVideo, videoError);
-}
+// Verificar se o dispositivo permite alterar entre câmeras
+navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+        // Verifique se há mais de uma câmera disponível
+        const cameras = devices.filter(device => device.kind === "videoinput");
+        if (cameras.length > 1) {
+            // Tente acessar a câmera traseira
+            navigator.getUserMedia({ video: { facingMode: "environment" } }, handleVideo, videoError);
+        } else {
+            console.log("Apenas uma câmera disponível ou dispositivo não permite alterar entre câmeras.");
+        }
+    });
 
 function handleVideo(stream) {
     // Mostre a imagem da câmera na tela
@@ -26,9 +35,9 @@ function handleVideo(stream) {
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
-        // Verifique se o resultado é não nulo e imprima o conteúdo do código QR na tela
+        // Verifique se o resultado é não nulo e atualize o conteúdo da tag <h3> com o conteúdo do código QR
         if (qrCode) {
-            console.log(qrCode.data);
+            document.getElementById("qr-code-content").innerText = qrCode.data;
         }
     }, 1000);
 }
