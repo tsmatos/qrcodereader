@@ -5,7 +5,7 @@ navigator.getUserMedia = navigator.getUserMedia ||
                         navigator.msGetUserMedia;
 
 if (navigator.getUserMedia) {
-    navigator.getUserMedia({ video: true }, handleVideo, videoError);
+    navigator.getUserMedia({ video: {facingMode: "environment"} }, handleVideo, videoError);
 }
 
 function handleVideo(stream) {
